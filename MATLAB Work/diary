@@ -1,0 +1,52 @@
+load('C:\Users\green\Documents\ENGR112\MATLAB Work\EX1\wsch2.mat')
+exist x
+
+ans =
+
+     1
+
+exist c
+
+ans =
+
+     0
+
+c = 12.123456789
+
+c =
+
+   12.1235
+
+format long
+c
+
+c =
+
+  12.123456789000000
+
+save wsch2new
+clc
+format long
+c
+
+c =
+
+  12.123456789000000
+
+format rat
+c
+
+c =
+
+     982/81    
+
+clear
+format long
+clc
+clc
+clear
+format
+load('C:\Users\green\Documents\ENGR112\MATLAB Work\EX1\wsch2.mat')
+clear
+load('wsch2new.mat')
+diary off

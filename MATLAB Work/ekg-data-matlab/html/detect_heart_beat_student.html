@@ -1,0 +1,168 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>detect_heart_beat_student</title><meta name="generator" content="MATLAB 9.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2022-03-03"><meta name="DC.source" content="detect_heart_beat_student.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="comment">%Andrew Green, ENGR112-0001, 3/3/22</span>
+<span class="comment">%</span>
+<span class="comment">%clear command window and variables before begining</span>
+clear; clc;
+
+<span class="comment">%load in the EKG data as time, ml2, and v5</span>
+load <span class="string">ekg-data-unknown.mat</span>
+
+<span class="comment">%provide a common name for the heart beat signal so we can try out</span>
+<span class="comment">%different data sets</span>
+heart_beat_signal = v5;
+
+<span class="comment">%perform the diff operation. Give the resulting variable</span>
+<span class="comment">%a new name beside "diff" so we don't overload the function name</span>
+derivative = diff(heart_beat_signal);
+
+<span class="comment">%perform the square operation on each element of the derivative</span>
+squares = derivative.^2;
+
+<span class="comment">%conduct a moving average over 10 pts/samples</span>
+moving_average = movmean(squares,10);
+
+<span class="comment">%use the findpeaks() function to identify the number of peaks</span>
+[peaks,locs] = findpeaks(moving_average,<span class="string">'MinPeakProminence'</span>,.02);
+
+<span class="comment">%print out in the command window the number of peaks detected</span>
+num_beats = length(peaks);
+fprintf(<span class="string">'The algorithm found %f peaks\n'</span>,num_beats);
+
+<span class="comment">%plot the original with time stamps</span>
+figure;
+plot(time,heart_beat_signal);
+title(<span class="string">'Plot of Single Trace EKG'</span>);
+xlabel(<span class="string">'Time (seconds)'</span>);
+ylabel(<span class="string">'V5 Signal (volts)'</span>);
+
+<span class="comment">%plot the final moving average with detected peaks overlayed as</span>
+<span class="comment">%orange circles</span>
+figure;
+new_time=time(2:end);
+plot(new_time,moving_average);
+hold <span class="string">on</span>;
+plot(new_time(locs),peaks,<span class="string">'or'</span>);
+title(<span class="string">'Moving Average of EKG Trace with Found Peaks Annotated'</span>);
+xlabel(<span class="string">'Time (seconds)'</span>);
+ylabel(<span class="string">'Moving Average Value'</span>);
+</pre><pre class="codeoutput">The algorithm found 54.000000 peaks
+</pre><img vspace="5" hspace="5" src="detect_heart_beat_student_01.png" alt=""> <img vspace="5" hspace="5" src="detect_heart_beat_student_02.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2021b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%Andrew Green, ENGR112-0001, 3/3/22
+%
+%clear command window and variables before begining
+clear; clc;
+
+%load in the EKG data as time, ml2, and v5
+load ekg-data-unknown.mat
+
+%provide a common name for the heart beat signal so we can try out
+%different data sets
+heart_beat_signal = v5;
+
+%perform the diff operation. Give the resulting variable
+%a new name beside "diff" so we don't overload the function name
+derivative = diff(heart_beat_signal);
+
+%perform the square operation on each element of the derivative
+squares = derivative.^2;
+
+%conduct a moving average over 10 pts/samples
+moving_average = movmean(squares,10);
+
+%use the findpeaks() function to identify the number of peaks
+[peaks,locs] = findpeaks(moving_average,'MinPeakProminence',.02);
+
+%print out in the command window the number of peaks detected
+num_beats = length(peaks);
+fprintf('The algorithm found %f peaks\n',num_beats);
+
+%plot the original with time stamps
+figure;
+plot(time,heart_beat_signal);
+title('Plot of Single Trace EKG');
+xlabel('Time (seconds)');
+ylabel('V5 Signal (volts)');
+
+%plot the final moving average with detected peaks overlayed as 
+%orange circles
+figure;
+new_time=time(2:end);
+plot(new_time,moving_average);
+hold on;
+plot(new_time(locs),peaks,'or');
+title('Moving Average of EKG Trace with Found Peaks Annotated');
+xlabel('Time (seconds)');
+ylabel('Moving Average Value');
+
+
+##### SOURCE END #####
+--></body></html>
