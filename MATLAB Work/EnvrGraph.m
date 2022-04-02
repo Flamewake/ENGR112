@@ -1,6 +1,10 @@
 % Attempting to make a map of the Route we took with Accel Sensor.
 % Ideally using integrals
-
+clc,clear
+accels_data = readmatrix('accel.txt');
+x1 = accels_data(:,1);
+y1 = accels_data(:,2);
+z1 = accels_data(:,3);
 % First step: Converting data to more usable unit. Data is in gs, need it in m/s^2
 conversion_factor = 9.80665;
 
@@ -26,7 +30,7 @@ end
 % Making the first value in the list Vx1 into Ux. Not elegant but I dont have another solution
 
 for i=2:7716
-    Vx1(i) = Vx1(i-1) + x1c(i) * Dx1(i);
+    Vx1(i) = Vx1(i-1) + x1c(i) * delTime;
 end
 % Setting the rest of the values in Vx1 into the actual acceleration values. Vf = Vinit + Accel*Time delta
 
@@ -36,19 +40,19 @@ end
 
 % Displacement: V=meters/second, so multiplying the Velocity by time delta gives the distance travelled
 Dx1 = Vx1 * delTime;
-Dy1 = Vy1 * delTime;
-Dz1 = Vz1 * delTime;
+%Dy1 = Vy1 * delTime;
+%Dz1 = Vz1 * delTime;
 
 % Position: Displacement = Dfinal - Dinitial. Im fairly certain theres error here.
 Px1 = Dx1;
 for i=2:7716
-    Px1(i) = Dx1(i) - Px1(i-1);
+    Px1(i) = Dx1(i) + Px1(i-1);
 end
 
-Py1 = Dy1;
-for i=2:7716
-    Py1(i) = Py1(i-1) + Dy1(i);
-end
+%Py1 = Dy1;
+%for i=2:7716
+%    Py1(i) = Py1(i-1) + Dy1(i);
+%end
 
 %% Ploting Stuff
 % plot3(x1,y1,z1)

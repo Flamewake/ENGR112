@@ -1,0 +1,6 @@
+Saccel = split(Accels,',');
+Za = Saccel(:,3);
+% Stime = split(Time,':');
+
+.046
+21.941
