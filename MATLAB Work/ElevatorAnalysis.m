@@ -4,11 +4,11 @@ Saccel = readmatrix('ElevatorUp.txt');
 Za = Saccel(:,3); 
 
 % Work to create an x axis that fits the data 
-steppy = 20.641/849;
+StepX = 20.641/849;
 hindex = 0:849;
 timevar = Za;
 for i=1:849
-    timevar(i) = steppy*hindex(i);
+    timevar(i) = StepX*hindex(i);
 end
 
 ZaN = Za;
@@ -23,13 +23,12 @@ title ("Plot of Acceleration in King Hall Elevator Going Up")
 xlabel("Time (seconds)")
 ylabel("Acceleration (m/s^2)")
 
-% Integrating for Velocity
-% Uz = ZaN(1,:) * steppy;  % Setting the first velocity value
+%%% Integrating for Velocity
 Vz = ZaN;  % Making Vz a list with the same length of Za
-for i=1
+for i=1    % Setting the first velocity value to 0 m/s
     Vz(i) = timevar(i)*0;
 end
-
+% Integrating the rest of the velocity values.
 for i=2:849
     Vz(i) = Vz(i-1) + ZaN(i) * steppy;
 end
@@ -41,7 +40,10 @@ title ("Plot of Integrated Velocity in King Hall Elevator Going Up")
 xlabel("Time (seconds)")
 ylabel("Velocity (m/s)")
 
-% ZvMean = mean(Vz,[100,700]);
+for i=80:680
+    VzMean = Vz;
+end
+VzMean = mean(VzMean,'all');
 
 % Messing around trying to make the Accel graph more readable
 timeXvar = 1:.1:849;
@@ -55,14 +57,9 @@ ylabel("Velocity (m/s)")
 
 %Zmed = medfilt1(ZaN,7);
 Zavgmed = movmean(Zmed,5);
-%daclock = 0;
-%while daclock < 10
-%    Zmed = medfilt1(Zmed);
-%   daclock = daclock + 1;
-%end
 
 figure(4)
 plot(timevar,Zavgmed)
-title ("Plot of median Accel in King Hall Elevator Going Up")
+title ("Plot of Moving Avg of Accel in King Hall Elevator Going Up")
 xlabel("Time (seconds)")
 ylabel("Velocity (m/s)")
